@@ -7,17 +7,32 @@
 </head>
 <body ng-controller="GameController" class="container">
 	
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<button class="pull-right" ng-click="newGame()">Start Game</button>
-			<h3>Connect 4</h3>
+	<div class="container">
+		<div class="game-heading">
+			<h1 class="text-center">Connect Four</h1>
 		</div>
-		<div class="panel-body text-center">
-			<div class="board">
-				<div class="row" ng-repeat="row in grid">
-					<div class="cell" ng-repeat="cell in row" ng-click="dropToken(cell.col)">
-						<div class="token" ng-style="{'background-color': cell.hasToken ? cell.color : '#fff'}"></div>
+		<div>
+			<div class="victory-message text-center" ng-if="victory">
+				<h1 ng-style="{'color': victor}">{{victor}} wins!</h1>
+				<button class="btn btn-info" ng-click="newGame()">Play Again?</button>
+			</div>
+			<div class="row board">
+				<div class="col-xs-1 col-md-2">
+					<div class="flying-buttress pull-right"></div>
+					<div class="flying-buttress-foot left-foot"></div>
+				</div>
+				<div class="col-xs-10 col-md-8">
+					<div class="text-center">
+						<div class="row" ng-repeat="row in grid">
+							<div class="cell" ng-repeat="cell in row" ng-click="dropToken(cell.col)" ng-style="{'opacity': victory ? 0.5 : 1.0}">
+								<div class="token" ng-style="{'background-color': cell.hasToken ? cell.color : '#fff'}"></div>
+							</div>
+						</div>
 					</div>
+				</div>
+				<div class="col-xs-1 col-md-2">
+					<div class="flying-buttress pull-left"></div>					
+					<div class="flying-buttress-foot right-foot"></div>					
 				</div>
 			</div>
 		</div>
