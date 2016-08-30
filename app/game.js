@@ -1,5 +1,5 @@
 angular.module('con4', [])
-	.controller('GameController', function($scope){
+	.controller('GameController', function($scope, $timeout){
 
 		this.$onInit = function(){
 			$scope.newGame();
@@ -27,44 +27,32 @@ angular.module('con4', [])
 		$scope.dropToken = function(col){
 			//Column is full no space available
 			if($scope.victory || $scope.grid[0][col].hasToken){
+				if ($scope.activePlayer == 'black') {
+					console.log('choose a new column, computer!')
+					col = chooseColumn();
+					return $scope.dropToken(col);
+				}
 				return;
 			}
 			
-			//Find the southMost unoccupied row
-			/**
-			 * Always start at row 0 and then increment
-			 * until you have reached the final row or 
-			 * found a cell that already has a token
-			 */
 			var row = checkSouth(0, col);
-
-			/**
-			 * Once the row is identified
-			 * set the cell by accessing 
-			 * $scope.grid[row][col]
-			 * set cell.hasToken = true
-			 * set cell.color $scope.activePlayer
-			 **/  
 			var cell = $scope.grid[row][col];
-			cell.hasToken = true;
-			cell.color = $scope.activePlayer;
+
+			var delay = 0;
+			if ($scope.activePlayer == 'black') {
+				delay = 1000;
+			}
+			$timeout(function(){
+				cell.hasToken = true;
+				cell.color = $scope.activePlayer;				
+				checkVictory(cell);
+				endTurn();
+			}, delay);
 			
-			//endTurn and checkVictory
-			checkVictory(cell);
-			endTurn();
 		}
 		
 		function checkSouth(row, col){
-		/**
-		 * Let's use recursion
-		 * A recursive function is...
-		 * a function that calls itself
-		 * until some condition is met
-		 * 
-		 * Check South will need essentially two base cases
-		 * 
-		 */
-			
+
 			//Base case 1 found south Token return row - 1 to go back one step
 			if ($scope.grid[row][col].hasToken) {
 				return row - 1;
@@ -85,10 +73,7 @@ angular.module('con4', [])
 		}
 		
 		function checkVictory(cell){
-			//This one is a gimme you shouldn't have to change anything here
-			//Once you fix the checkNextCell function the green squiggles should dissapear.
-			//If they don't make sure you are returning a number from the checkNextCell function
-			
+
 			var horizontalMatches = 0;
 			//Check Horizontal
 			horizontalMatches += checkNextCell(cell, 0, 'left');
@@ -109,7 +94,6 @@ angular.module('con4', [])
 			diagRight += checkNextCell(cell, 0, 'diagDownLeft');
 			
 			if(verticalMatches >= 3 || horizontalMatches >= 3 || diagLeft >= 3 || diagRight >= 3){
-				//You can do better than an alert 
 				$scope.victory = true;
 				$scope.victor = cell.color;
 			}
@@ -171,10 +155,30 @@ angular.module('con4', [])
 		
 		function endTurn(){
 
+			if ($scope.victory) {
+				return;
+			}
 			if ($scope.activePlayer == 'red') {
 				$scope.activePlayer = 'black';
+				playComputerTurn();
 			} else if ($scope.activePlayer == 'black') {
 				$scope.activePlayer = 'red';
 			}
+
 		}
+
+		function playComputerTurn() {
+
+			var col = Math.floor(Math.random() * $scope.grid[0].length);
+			// console.log(col);
+			$scope.dropToken(col);
+
+		}
+
+		function chooseColumn(){
+			var col = Math.floor(Math.random() * $scope.grid[0].length);
+			console.log('new column: ' + col);
+			return col;
+		}
+
 	});
